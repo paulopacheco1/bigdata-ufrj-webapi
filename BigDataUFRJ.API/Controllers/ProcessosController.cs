@@ -1,5 +1,6 @@
 ﻿using BigDataUFRJ.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using System;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace BigDataUFRJ.API.Controllers
 
         public ProcessosController(ProcessosDBSettings settings)
         {
+            var conventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
+            ConventionRegistry.Register("camelCase", conventionPack, t => true);
+
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
 
@@ -53,8 +57,8 @@ namespace BigDataUFRJ.API.Controllers
             if (processoJaExiste != null) return BadRequest("Já existe um processo cadastrado com esse número");
 
             var processo = dto.ToModel();
-            processo.CreatedAt = DateTime.Now;
-            processo.UpdatedAt = DateTime.Now;
+            //processo.CreatedAt = DateTime.Now;
+            //processo.UpdatedAt = DateTime.Now;
 
             await _processos.InsertOneAsync(processo);
             return CreatedAtAction(nameof(Get), new { numeroProcesso = processo.NumJustica }, processo);
@@ -66,12 +70,14 @@ namespace BigDataUFRJ.API.Controllers
             var processo = await _processos.Find(processo => processo.NumJustica == numeroProcesso).FirstOrDefaultAsync();
             if (processo == null) return NotFound("Processo não encontrado");
 
-            var update = Builders<ProcessoJudicial>.Update.Set(p => p.UpdatedAt, DateTime.Now);
+            //var update = Builders<ProcessoJudicial>.Update.Set(p => p.UpdatedAt, DateTime.Now);
+            UpdateDefinition<ProcessoJudicial> update = null;
             foreach (var prop in dto.GetType().GetProperties())
             {
                 if (prop.GetValue(dto) != default)
                 {
-                    update = update.Set(prop.Name, prop.GetValue(dto));
+                    if (update == null) update = Builders<ProcessoJudicial>.Update.Set(prop.Name, prop.GetValue(dto));
+                    else update = update.Set(prop.Name, prop.GetValue(dto));
                 }
             }
 

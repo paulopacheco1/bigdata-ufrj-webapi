@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 using System.Collections.Generic;
 
 namespace BigDataUFRJ.API.Models
@@ -12,11 +11,21 @@ namespace BigDataUFRJ.API.Models
         public string NumJustica { get; set; }
         public string Tribunal { get; set; }
         public string Comarca { get; set; }
-        public string UF { get; set; }
-        public List<string> Partes { get; set; }
+        public string Uf { get; set; }
+        public List<ProcessoJudicialParte> Partes { get; set; }
         public List<string> Andamentos { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+    }
+
+    public class ProcessoJudicialParte
+    {
+        public string Nome { get; set; }
+        public List<ProcessoJudicialParteAdvogado> Advogados { get; set; }
+    }
+
+    public class ProcessoJudicialParteAdvogado
+    {
+        public string Nome { get; set; }
+        public string Oab { get; set; }
     }
 
     public class ProcessoJudicialCreateDTO
@@ -24,8 +33,8 @@ namespace BigDataUFRJ.API.Models
         public string NumJustica { get; set; }
         public string Tribunal { get; set; }
         public string Comarca { get; set; }
-        public string UF { get; set; }
-        public List<string> Partes { get; set; }
+        public string Uf { get; set; }
+        public List<ProcessoJudicialParte> Partes { get; set; }
         public List<string> Andamentos { get; set; }
 
         public ProcessoJudicial ToModel()
@@ -35,7 +44,7 @@ namespace BigDataUFRJ.API.Models
                 NumJustica = NumJustica,
                 Tribunal = Tribunal,
                 Comarca = Comarca,
-                UF = UF,
+                Uf = Uf,
                 Partes = Partes,
                 Andamentos = Andamentos,
             };
@@ -46,8 +55,8 @@ namespace BigDataUFRJ.API.Models
     {
         public string Tribunal { get; set; }
         public string Comarca { get; set; }
-        public string UF { get; set; }
-        public List<string> Partes { get; set; }
+        public string Uf { get; set; }
+        public List<ProcessoJudicialParte> Partes { get; set; }
         public List<string> Andamentos { get; set; }
     }
 }
